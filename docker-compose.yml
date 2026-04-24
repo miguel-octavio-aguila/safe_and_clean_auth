@@ -1,0 +1,37 @@
+services:
+  # Django backend app
+  sc_auth:
+    container_name: sc_auth
+    build: .
+    command: uvicorn safe_and_clean_auth.asgi:application --host 0.0.0.0 --port 8001 --reload
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    depends_on:
+      - sc_redis_auth
+      - sc_db_auth
+
+  # Redis
+  sc_redis_auth:
+    image: redis
+    container_name: sc_redis_auth
+    ports:
+      - "6380:6379"
+
+  # Database
+  sc_db_auth:
+    image: postgres:18
+    container_name: sc_db_auth
+    restart: always
+    environment:
+      POSTGRES_DB: sc_db_auth
+      POSTGRES_USER: sc_user_auth
+      POSTGRES_PASSWORD: Db@dm1n_sc_auth
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:

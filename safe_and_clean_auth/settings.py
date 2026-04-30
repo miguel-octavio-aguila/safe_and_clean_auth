@@ -65,7 +65,7 @@ ROOT_URLCONF = 'safe_and_clean_auth.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -171,14 +171,32 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'SIGNING_KEY': env('SECRET_KEY'),   
+    'TOKEN_OBTAIN_SERIALIZER': 'apps.accounts.serializers.CustomTokenObtainPairSerializer',
 }
-
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
     'SEND_ACTIVATION_EMAIL': True,
-    'SERIALIZERS': {},
+
+    'PASSWORD_RESET_CONFIRM_URL': '/email/password_reset_confirm/{uid}/{token}',
+    'ACTIVATION_URL': '/email/activate/{uid}/{token}',
+
+    'SERIALIZERS': {
+        'user_create': 'apps.accounts.serializers.UserCreateSerializer',
+        'user': 'apps.accounts.serializers.UserSerializer',
+        'current_user': 'apps.accounts.serializers.UserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+        'password_reset': 'apps.accounts.serializers.CustomPasswordResetSerializer',
+    },
+
+    'TEMPLATES': {
+        'activation': 'email/auth/activation.html',
+        'confirmation': 'email/auth/confirmation.html',
+        'password_reset': 'email/auth/password_reset.html',
+        'password_reset_confirm': 'email/auth/password_reset_confirm.html',
+    }
 }
 
 CHANNEL_LAYERS = {

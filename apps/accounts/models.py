@@ -116,6 +116,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.get_full_name()} ({self.get_role_display()})"
 
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
+    def get_short_name(self):
+        return self.first_name
+
     @property
     def is_admin_role(self):
         return self.role == self.Role.ADMIN

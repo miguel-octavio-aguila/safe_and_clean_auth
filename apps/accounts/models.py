@@ -1,3 +1,4 @@
+from django.utils.http import is_same_domain
 import uuid
 
 from django.db.models import EmailField
@@ -83,6 +84,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         choices=Role.choices,
         default=Role.EMPLOYEE,
     )
+
+    is_active = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)

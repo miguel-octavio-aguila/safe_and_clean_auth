@@ -26,43 +26,48 @@ class UserAccountManager(BaseUserManager):
 
     RESTRICTED_USERNAMES = ['admin', 'superuser', 'staff', 'undefined', 'null', 'root', 'system']
     
-    def create_user(self, email, phone, password=None, **extra_fields):
-        if Role.EMPLOYEE and not phone:
+    def create_user(self, email, password=None, **extra_fields):
+        phone = extra_fields.get('phone', '')
+        role = extra_fields.get('role', Role.EMPLOYEE)
+
+        if role == Role.EMPLOYEE and not phone:
             raise ValueError('Este tipo de usuario debe de tener un teléfono registrado')
         
-        if Role.CLIENT or Role.ADMIN and not phone and not email:
+        if role in [Role.CLIENT, Role.ADMIN] and not phone and not email:
             raise ValueError('Este tipo de usuario debe de tener un teléfono o correo electrónico registrado')
         
         email = self.normalize_email(email)
-        phone = phone
-        user = self.model(email=email, phone=phone, **extra_fields)
+        user = self.model(email=email, **extra_fields)
 
         first_name = extra_fields.get('first_name', '')
         last_name = extra_fields.get('last_name', '')
 
-        if not first_name and not last_name:
+        if not first_name or not last_name:
             raise ValueError('Los usuarios deben de tener un nombre y apellido registrado')
-        
-        user.first_name = first_name
-        user.last_name = last_name
 
         username = extra_fields.get('username', None)
         if username and username.lower() in self.RESTRICTED_USERNAMES:
             raise ValueError(f'El nombre de usuario "{username}" no está permitido.')
 
         if not username:
-            username = self.email
+            user.username = email
         
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
+
         user.save(using=self._db)
         
         return user
 
-    def create_superuser(self, email, phone,password, **extra_fields):
-        user = self.create_user(email, phone, password, **extra_fields)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('role', Role.ADMIN)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
+        return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
@@ -95,6 +100,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username", "first_name", "last_name"]
 
+    objects = UserAccountManager()
 
     class Meta:
         db_table = '"accounts"."custom_user"'

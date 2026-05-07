@@ -22,3 +22,5 @@ argon2-cffi-bindings==25.1.0
 djangorestframework-simplejwt==5.5.1
 
 boto3==1.43.4
+
+twilio==9.6.3

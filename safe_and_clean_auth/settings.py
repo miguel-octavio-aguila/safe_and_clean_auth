@@ -194,6 +194,9 @@ SIMPLE_JWT = {
     'TOKEN_OBTAIN_SERIALIZER': 'apps.accounts.serializers.CustomTokenObtainPairSerializer',
 }
 
+DOMAIN = env('FRONTEND_DOMAIN', default='localhost:3000') 
+SITE_NAME = 'Safe & Clean Querétaro'
+
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'USER_CREATE_PASSWORD_RETYPE': True,

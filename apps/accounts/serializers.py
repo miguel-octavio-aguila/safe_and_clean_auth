@@ -1,6 +1,6 @@
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from djoser.serializers import UserCreateSerializer
+from djoser.serializers import UserCreatePasswordRetypeSerializer
 from djoser.conf import settings as djoser_settings
 from django.contrib.auth import get_user_model
 from apps.accounts.models import Role
@@ -8,8 +8,8 @@ from apps.accounts.models import Role
 User = get_user_model()
 
 
-class UserCreateSerializer(UserCreateSerializer):
-    class Meta(UserCreateSerializer.Meta):
+class UserCreateSerializer(UserCreatePasswordRetypeSerializer):
+    class Meta(UserCreatePasswordRetypeSerializer.Meta):
         model = User
         fields = "__all__"
 

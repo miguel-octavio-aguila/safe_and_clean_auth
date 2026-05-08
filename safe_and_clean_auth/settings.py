@@ -200,12 +200,14 @@ DJOSER = {
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'SEND_CONFIRMATION_EMAIL': True,
     'SEND_ACTIVATION_EMAIL': True,
+    'SET_PASSWORD_RETYPE': True,
 
-    'PASSWORD_RESET_CONFIRM_URL': '/email/password_reset_confirm/{uid}/{token}',
-    'ACTIVATION_URL': '/email/activate/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'email/password_reset_confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'email/activate/{uid}/{token}',
 
     'SERIALIZERS': {
         'user_create': 'apps.accounts.serializers.UserCreateSerializer',
+        'user_create_password_retype': 'apps.accounts.serializers.UserCreateSerializer',
         'user': 'apps.accounts.serializers.UserSerializer',
         'current_user': 'apps.accounts.serializers.UserSerializer',
         'user_delete': 'djoser.serializers.UserDeleteSerializer',

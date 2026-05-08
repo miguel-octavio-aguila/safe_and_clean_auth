@@ -135,34 +135,41 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.role == self.Role.CLIENT
 
 
-class ClientProfile(BaseModel):
+def profile_picture_upload_to(instance, filename):
+    """Upload path: media/profile_pictures/<user_id>/<filename>"""
+    return f"profile_pictures/{instance.user_id}/{filename}"
+
+
+class UserProfile(BaseModel):
     """
-    Extended profile for CLIENT-role users.
-    Represents a company or organization (corporativo, industrial, plaza comercial)
-    that contracts Safe + Clean Qro's services.
+    Minimal profile for ALL users (Admin, Employee, Client).
+    Stored in Auth because it is universal — every user can have a photo.
+
+    Business-specific data lives in the Backend service:
+      - Employee details  → personnel.Employee (safe_and_clean_backend)
+      - Client details    → accounts.Client    (safe_and_clean_backend)
     """
 
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name="client_profile",
+        related_name="profile",
         verbose_name="usuario",
     )
-    company_name = models.CharField("nombre de empresa", max_length=200)
-    contact_name = models.CharField("nombre de contacto", max_length=200)
-    address = models.CharField("dirección", max_length=300, blank=True)
-    notes = models.TextField("notas", blank=True)
-
+    profile_picture = models.ImageField(
+        "foto de perfil",
+        upload_to=profile_picture_upload_to,
+        blank=True,
+        null=True,
+    )
 
     class Meta:
-        db_table = '"accounts"."client_profile"'
-        verbose_name = "perfil de cliente"
-        verbose_name_plural = "perfiles de clientes"
-        ordering = ["company_name"]
-
+        db_table = '"accounts"."user_profile"'
+        verbose_name = "perfil de usuario"
+        verbose_name_plural = "perfiles de usuario"
 
     def __str__(self):
-        return self.company_name
+        return f"Perfil de {self.user.get_full_name()}"
 
 
 def post_user_registered(user, *args, **kwargs):

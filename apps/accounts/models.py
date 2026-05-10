@@ -146,8 +146,8 @@ class UserProfile(BaseModel):
     Stored in Auth because it is universal — every user can have a photo.
 
     Business-specific data lives in the Backend service:
-      - Employee details  → personnel.Employee (safe_and_clean_backend)
-      - Client details    → accounts.Client    (safe_and_clean_backend)
+        - Employee details  → personnel.Employee (safe_and_clean_backend)
+        - Client details    → accounts.Client    (safe_and_clean_backend)
     """
 
     user = models.OneToOneField(

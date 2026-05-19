@@ -11,7 +11,7 @@ from django.contrib.auth.models import (
 from djoser.signals import user_registered, user_activated
 from django.utils import timezone
 
-from apps.core.models import BaseModel
+from ..core.models import BaseModel
 
 class Role(models.TextChoices):
     ADMIN = 'ADMIN', 'Administrador'

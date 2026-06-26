@@ -32,10 +32,10 @@ class UserAccountManager(BaseUserManager):
 
         if role == Role.EMPLOYEE and not phone:
             raise ValueError('Este tipo de usuario debe de tener un teléfono registrado')
-        
+
         if role in [Role.CLIENT, Role.ADMIN] and not phone and not email:
             raise ValueError('Este tipo de usuario debe de tener un teléfono o correo electrónico registrado')
-        
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
 
@@ -51,7 +51,7 @@ class UserAccountManager(BaseUserManager):
 
         if not username:
             user.username = email
-        
+
         if password:
             user.set_password(password)
         else:

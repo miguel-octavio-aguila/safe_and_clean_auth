@@ -25,7 +25,7 @@ class UserAccountManager(BaseUserManager):
     """
 
     RESTRICTED_USERNAMES = ['admin', 'superuser', 'staff', 'undefined', 'null', 'root', 'system']
-    
+
     def create_user(self, email, password=None, **extra_fields):
         phone = extra_fields.get('phone', '')
         role = extra_fields.get('role', Role.EMPLOYEE)

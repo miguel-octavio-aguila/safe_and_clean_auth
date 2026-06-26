@@ -136,8 +136,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 def profile_picture_upload_to(instance, filename):
-    """Upload path: media/profile_pictures/<user_id>/<filename>"""
-    return f"profile_pictures/{instance.user_id}/{filename}"
+    """Upload path: media/profile_pictures/<first_name><last_name>/<filename>"""
+    return f"profile_pictures/{instance.first_name.lower()}_{instance.last_name.lower()}/{filename}"
 
 
 class UserProfile(BaseModel):

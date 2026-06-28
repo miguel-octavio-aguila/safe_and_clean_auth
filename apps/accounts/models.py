@@ -19,6 +19,13 @@ class Role(models.TextChoices):
     CLIENT = 'CLIENT', 'Cliente'
 
 
+class MessageType(models.TextChoices):
+    ACTIVATION = 'ACTIVATION', 'Activación'
+    CONFIRMATION = 'CONFIRMATION', 'Confirmación'
+    PASSWORD_CHANGE = 'PASSWORD_CHANGE', 'Cambio de contraseña'
+    PASSWORD_RESET = 'PASSWORD_RESET', 'Restablecimiento de contraseña'
+    PASSWORD_RESET_CONFIRM = 'PASSWORD_RESET_CONFIRM', 'Confirmación de restablecimiento de contraseña'
+
 class UserAccountManager(BaseUserManager):
     """
     Manager for user accounts.
@@ -79,7 +86,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = models.CharField("nombre de usuario", max_length=150, unique=True)
     email = models.EmailField("correo electrónico", unique=True)
-    phone = models.CharField("teléfono", max_length=15, blank=True)
+    phone_number = models.CharField("teléfono", max_length=15, blank=True)
     first_name = models.CharField("nombre", max_length=150)
     last_name = models.CharField("apellido", max_length=150)
 
@@ -170,6 +177,115 @@ class UserProfile(BaseModel):
 
     def __str__(self):
         return f"Perfil de {self.user.get_full_name()}"
+
+
+class EmployeeMessages(BaseModel):
+    employee = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="employee_messages",
+        verbose_name="empleado",
+        limit_choices_to={'role': Role.EMPLOYEE}
+    )
+    messageType = models.CharField(
+        "tipo de mensaje",
+        max_length=50,
+        choices=MessageType.choices,
+    )
+    message = models.TextField("mensaje")
+
+    employee_name = models.CharField("nombre del empleado", max_length=255, blank=True)
+    phone_number = models.CharField("teléfono", max_length=15, blank=True)
+
+    class Meta:
+        db_table = '"accounts"."employee_messages"'
+        verbose_name = "mensaje de empleado"
+        verbose_name_plural = "mensajes de empleados"
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        if self.employee:
+            if not self.employee_name:
+                self.employee_name = self.employee.get_full_name()
+            if not self.phone_number:
+                self.phone_number = self.employee.phone_number
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.message
+
+
+class AdminMessages(BaseModel):
+    admin = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="admin_messages",
+        verbose_name="admin",
+        limit_choices_to={'role': Role.ADMIN}
+    )
+    messageType = models.CharField(
+        "tipo de mensaje",
+        max_length=50,
+        choices=MessageType.choices,
+    )
+    message = models.TextField("mensaje")
+
+    admin_name = models.CharField("nombre del admin", max_length=255, blank=True)
+    phone_number = models.CharField("teléfono", max_length=15, blank=True)
+
+    class Meta:
+        db_table = '"accounts"."admin_messages"'
+        verbose_name = "mensaje de admin"
+        verbose_name_plural = "mensajes de admins"
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        if self.admin:
+            if not self.admin_name:
+                self.admin_name = self.admin.get_full_name()
+            if not self.phone_number:
+                self.phone_number = self.admin.phone_number
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.message
+
+
+class ClientMessages(BaseModel):
+    client = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="client_messages",
+        verbose_name="cliente",
+        limit_choices_to={'role': Role.CLIENT}
+    )
+    messageType = models.CharField(
+        "tipo de mensaje",
+        max_length=50,
+        choices=MessageType.choices,
+    )
+    message = models.TextField("mensaje")
+
+    client_name = models.CharField("nombre del cliente", max_length=255, blank=True)
+    phone_number = models.CharField("teléfono", max_length=15, blank=True)
+
+    class Meta:
+        db_table = '"accounts"."client_messages"'
+        verbose_name = "mensaje de cliente"
+        verbose_name_plural = "mensajes de clientes"
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        if self.client:
+            if not self.client_name:
+                self.client_name = self.client.get_full_name()
+            if not self.phone_number:
+                self.phone_number = self.client.phone_number
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.message
+
 
 
 def post_user_registered(user, *args, **kwargs):

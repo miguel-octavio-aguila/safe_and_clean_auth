@@ -12,7 +12,7 @@ class CustomUserAdmin(UserAdmin):
         "first_name",
         "last_name",
         "role",
-        "phone",
+        "phone_number",
         "is_active",
         "is_staff",
     )
@@ -29,7 +29,7 @@ class CustomUserAdmin(UserAdmin):
         (None, {
             'fields': (
                 'email',
-                'phone',
+                'phone_number',
                 'role',
                 'username',
                 'password'
@@ -65,7 +65,7 @@ class CustomUserAdmin(UserAdmin):
             'classes': ('wide',),
             'fields': (
                 'email',
-                'phone',
+                'phone_number',
                 'role',
                 'username',
                 'first_name',
@@ -79,7 +79,7 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
 
-    search_fields = ('username', 'email', 'first_name', 'last_name', 'phone', 'role')
+    search_fields = ('username', 'email', 'first_name', 'last_name', 'phone_number', 'role')
     ordering = ('email',)
     readonly_fields = ('created_at', 'updated_at', 'last_login')
 

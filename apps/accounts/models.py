@@ -25,17 +25,17 @@ class UserAccountManager(BaseUserManager):
     """
 
     RESTRICTED_USERNAMES = ['admin', 'superuser', 'staff', 'undefined', 'null', 'root', 'system']
-    
+
     def create_user(self, email, password=None, **extra_fields):
         phone = extra_fields.get('phone', '')
         role = extra_fields.get('role', Role.EMPLOYEE)
 
         if role == Role.EMPLOYEE and not phone:
             raise ValueError('Este tipo de usuario debe de tener un teléfono registrado')
-        
+
         if role in [Role.CLIENT, Role.ADMIN] and not phone and not email:
             raise ValueError('Este tipo de usuario debe de tener un teléfono o correo electrónico registrado')
-        
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
 
@@ -51,7 +51,7 @@ class UserAccountManager(BaseUserManager):
 
         if not username:
             user.username = email
-        
+
         if password:
             user.set_password(password)
         else:
@@ -136,8 +136,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 def profile_picture_upload_to(instance, filename):
-    """Upload path: media/profile_pictures/<user_id>/<filename>"""
-    return f"profile_pictures/{instance.user_id}/{filename}"
+    """Upload path: media/profile_pictures/<first_name><last_name>/<filename>"""
+    return f"profile_pictures/{instance.first_name.lower()}_{instance.last_name.lower()}/{filename}"
 
 
 class UserProfile(BaseModel):

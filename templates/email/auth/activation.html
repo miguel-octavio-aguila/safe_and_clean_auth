@@ -1,25 +1,256 @@
-{% load i18n %} {% block subject %} {% blocktrans %}Account activation on {{
-site_name }}{% endblocktrans %} {% endblock subject %} {% block text_body %} {%
-blocktrans %}You're receiving this email because you need to finish activation
-process on {{ site_name }}.{% endblocktrans %} {% trans "Please go to the
-following page to activate account:" %} {{ protocol }}://{{ domain }}/{{
-url|safe }} {% trans "Thanks for using our site!" %} {% blocktrans %}The {{
-site_name }} team{% endblocktrans %} {% endblock text_body %} {% block html_body
-%}
-<p>
-  {% blocktrans %}You're receiving this email because you need to finish
-  activation process on {{ site_name }}.{% endblocktrans %}
-</p>
+{% block subject %}Activa tu cuenta en Safe + Clean Qro{% endblock subject %} {%
+block text_body %} Hola {{ user.first_name }}, Tu cuenta en Safe + Clean Qro ha
+sido creada. Para activarla visita el siguiente enlace: {{ protocol }}://{{
+domain }}/{{ url|safe }} Si no solicitaste esta cuenta, puedes ignorar este
+correo. El equipo de Safe + Clean Qro {% endblock text_body %} {% block
+html_body %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Activa tu cuenta</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f0f2f5;
+      font-family: Arial, Helvetica, sans-serif;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 16px">
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="width: 100%; max-width: 580px"
+          >
+            <!-- HEADER -->
+            <tr>
+              <td
+                style="
+                  background-color: #0d1b2a;
+                  border-radius: 10px 10px 0 0;
+                  padding: 36px 40px;
+                  text-align: center;
+                "
+              >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 11px;
+                    letter-spacing: 4px;
+                    color: #1a7c45;
+                    text-transform: uppercase;
+                    font-weight: 600;
+                  "
+                >
+                  &#9679; Servicios de limpieza profesional &#9679;
+                </p>
+                <h1
+                  style="
+                    margin: 10px 0 0;
+                    font-size: 26px;
+                    letter-spacing: 3px;
+                    color: #ffffff;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                  "
+                >
+                  SAFE + CLEAN QRO
+                </h1>
+              </td>
+            </tr>
 
-<p>{% trans "Please go to the following page to activate account:" %}</p>
-<p>
-  <a href="{{ protocol }}://{{ domain }}/{{ url|safe }}"
-    >{{ protocol }}://{{ domain }}/{{ url|safe }}
-  </a>
-</p>
+            <!-- ACCENT BAR -->
+            <tr>
+              <td
+                style="
+                  height: 4px;
+                  background-color: #1a7c45;
+                  font-size: 0;
+                  line-height: 0;
+                "
+              ></td>
+            </tr>
 
-<p>{% trans "Thanks for using our site!" %}</p>
+            <!-- BODY -->
+            <tr>
+              <td style="background-color: #ffffff; padding: 40px 40px 36px">
+                <h2
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 21px;
+                    color: #0d1b2a;
+                    font-weight: 700;
+                    border-left: 4px solid #1a7c45;
+                    padding-left: 14px;
+                  "
+                >
+                  Activa tu cuenta
+                </h2>
 
-<p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
+                <p
+                  style="
+                    margin: 0 0 10px;
+                    font-size: 15px;
+                    color: #2d3748;
+                    line-height: 1.7;
+                  "
+                >
+                  Hola <strong>{{ user.first_name }}</strong>,
+                </p>
 
+                <p
+                  style="
+                    margin: 0 0 28px;
+                    font-size: 15px;
+                    color: #4a5568;
+                    line-height: 1.7;
+                  "
+                >
+                  Tu cuenta en <strong>Safe + Clean Qro</strong> ha sido creada
+                  exitosamente. Para comenzar a utilizarla, necesitas confirmar
+                  tu correo electrónico haciendo clic en el botón a
+                  continuación.
+                </p>
+
+                <!-- CTA BUTTON -->
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                >
+                  <tr>
+                    <td
+                      style="
+                        border-radius: 6px;
+                        background-color: #1a7c45;
+                        box-shadow: 0 2px 6px rgba(26, 124, 69, 0.35);
+                      "
+                    >
+                      <a
+                        href="{{ protocol }}://{{ domain }}/{{ url|safe }}"
+                        target="_blank"
+                        style="
+                          display: inline-block;
+                          padding: 15px 36px;
+                          font-size: 15px;
+                          font-weight: 700;
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 6px;
+                          letter-spacing: 0.5px;
+                        "
+                      >
+                        Activar mi cuenta
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  style="
+                    margin: 28px 0 0;
+                    font-size: 12px;
+                    color: #718096;
+                    line-height: 1.6;
+                  "
+                >
+                  Si el botón no funciona, copia y pega este enlace en tu
+                  navegador:<br />
+                  <a
+                    href="{{ protocol }}://{{ domain }}/{{ url|safe }}"
+                    style="color: #1b4f8a; word-break: break-all"
+                  >
+                    {{ protocol }}://{{ domain }}/{{ url|safe }}
+                  </a>
+                </p>
+
+                <hr
+                  style="
+                    border: none;
+                    border-top: 1px solid #e2e8f0;
+                    margin: 32px 0 24px;
+                  "
+                />
+
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #a0aec0;
+                    line-height: 1.6;
+                  "
+                >
+                  Si no solicitaste esta cuenta, puedes ignorar este correo de
+                  forma segura. Este enlace expira en 24 horas.
+                </p>
+              </td>
+            </tr>
+
+            <!-- BLUE ACCENT BAR -->
+            <tr>
+              <td
+                style="
+                  height: 3px;
+                  background-color: #1b4f8a;
+                  font-size: 0;
+                  line-height: 0;
+                "
+              ></td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td
+                style="
+                  background-color: #0d1b2a;
+                  border-radius: 0 0 10px 10px;
+                  padding: 24px 40px;
+                  text-align: center;
+                "
+              >
+                <p
+                  style="
+                    margin: 0 0 6px;
+                    font-size: 13px;
+                    color: #ffffff;
+                    font-weight: 700;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                  "
+                >
+                  Safe + Clean Qro
+                </p>
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 11px;
+                    color: #718096;
+                    letter-spacing: 0.5px;
+                  "
+                >
+                  Limpieza &nbsp;·&nbsp; Jardinería &nbsp;·&nbsp; Lavado de
+                  autos
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
 {% endblock html_body %}

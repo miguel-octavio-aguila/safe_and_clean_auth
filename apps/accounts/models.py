@@ -93,10 +93,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     Supports three roles: Admin, Employee, and Client.
     """
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     username = models.CharField("nombre de usuario", max_length=150, unique=True)
     email = models.EmailField("correo electrónico", unique=True)
-    phone_number = models.CharField("teléfono", max_length=15, blank=True)
+    phone_number = models.CharField("teléfono", max_length=15, blank=True, unique=True)
     first_name = models.CharField("nombre", max_length=150)
     last_name = models.CharField("apellido", max_length=150)
 

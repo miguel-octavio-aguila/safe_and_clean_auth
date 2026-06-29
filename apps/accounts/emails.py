@@ -86,20 +86,28 @@ def _send(instance, to, msg_type):
 # ---------------------------------------------------------------------------
 
 class ActivationEmail(djoser_email.ActivationEmail):
+    template_name = 'email/auth/activation.html'
+
     def send(self, to, *args, **kwargs):
         _send(self, to, MessageType.ACTIVATION)
 
 
 class ConfirmationEmail(djoser_email.ConfirmationEmail):
+    template_name = 'email/auth/confirmation.html'
+
     def send(self, to, *args, **kwargs):
         _send(self, to, MessageType.CONFIRMATION)
 
 
 class PasswordResetEmail(djoser_email.PasswordResetEmail):
+    template_name = 'email/auth/password_reset.html'
+
     def send(self, to, *args, **kwargs):
         _send(self, to, MessageType.PASSWORD_RESET)
 
 
 class PasswordChangedConfirmationEmail(djoser_email.PasswordChangedConfirmationEmail):
+    template_name = 'email/auth/password_changed_confirmation.html'
+
     def send(self, to, *args, **kwargs):
         _send(self, to, MessageType.PASSWORD_CHANGE)

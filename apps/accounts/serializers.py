@@ -49,7 +49,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 pass
         elif phone:
             try:
-                user = User.objects.get(phone=phone)
+                user = User.objects.get(phone_number=phone)
                 if user.role != Role.EMPLOYEE:
                     raise serializers.ValidationError('Los administradores y clientes deben iniciar sesión con su correo electrónico.')
             except User.DoesNotExist:
@@ -99,7 +99,7 @@ class CustomPasswordResetSerializer(serializers.Serializer):
                 pass
         elif phone:
             try:
-                user = User.objects.get(phone=phone)
+                user = User.objects.get(phone_number=phone)
                 if user.role != Role.EMPLOYEE:
                     raise serializers.ValidationError("Los administradores y clientes deben recuperar contraseña con su correo.")
                 self.user = user

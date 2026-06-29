@@ -1,8 +1,8 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import update_last_login
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from djoser.serializers import UserCreatePasswordRetypeSerializer
-from djoser.conf import settings as djoser_settings
-from django.contrib.auth import get_user_model
 from apps.accounts.models import Role
 
 User = get_user_model()
@@ -68,6 +68,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             )
 
         self.user = user
+        update_last_login(None, self.user)
 
         refresh = self.get_token(self.user)
 
@@ -113,3 +114,78 @@ class CustomPasswordResetSerializer(serializers.Serializer):
 
     def get_user(self):
         return self.user
+
+
+# ---------------------------------------------------------------------------
+# Employee SMS flow
+# ---------------------------------------------------------------------------
+
+class EmployeeUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'phone_number', 'first_name', 'last_name', 'role', 'is_active', 'created_at', 'updated_at']
+        read_only_fields = fields
+
+
+class EmployeeRegisterSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(max_length=15)
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+    re_password = serializers.CharField(write_only=True)
+
+    def validate_phone_number(self, value):
+        if User.objects.filter(phone_number=value).exists():
+            raise serializers.ValidationError('Ya existe un usuario con este número de teléfono.')
+        return value
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['re_password']:
+            raise serializers.ValidationError({'re_password': ['Las contraseñas no coinciden.']})
+        from django.contrib.auth.password_validation import validate_password
+        validate_password(attrs['password'])
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop('re_password')
+        password = validated_data.pop('password')
+        user = User.objects.create_user(email=None, role=Role.EMPLOYEE, **validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+
+class EmployeeActivateSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
+    code = serializers.CharField()
+
+
+class EmployeePasswordResetSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
+
+
+class EmployeePasswordResetConfirmSerializer(serializers.Serializer):
+    phone_number = serializers.CharField()
+    code = serializers.CharField()
+    new_password = serializers.CharField(write_only=True)
+    re_new_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['re_new_password']:
+            raise serializers.ValidationError({'re_new_password': ['Las contraseñas no coinciden.']})
+        from django.contrib.auth.password_validation import validate_password
+        validate_password(attrs['new_password'])
+        return attrs
+
+
+class EmployeeSetPasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    re_new_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['re_new_password']:
+            raise serializers.ValidationError({'re_new_password': ['Las contraseñas no coinciden.']})
+        from django.contrib.auth.password_validation import validate_password
+        validate_password(attrs['new_password'])
+        return attrs

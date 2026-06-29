@@ -194,6 +194,7 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'SIGNING_KEY': env('SECRET_KEY'),   
     'TOKEN_OBTAIN_SERIALIZER': 'apps.accounts.serializers.CustomTokenObtainPairSerializer',
+    'UPDATE_LAST_LOGIN': True,
 }
 
 DOMAIN = env('FRONTEND_DOMAIN', default='localhost:3000') 

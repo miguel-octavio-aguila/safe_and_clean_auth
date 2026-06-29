@@ -1,0 +1,1 @@
+{{ site_name }}: ¡Hola {{ first_name }}! Tu cuenta ha sido activada exitosamente. Ya puedes iniciar sesión con tu número de teléfono.

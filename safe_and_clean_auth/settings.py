@@ -155,10 +155,22 @@ RESEND_API_KEY = env('RESEND_API_KEY')
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-# Twilio Verify
+# Twilio
 TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN')
 TWILIO_VERIFY_SERVICE_SID = env('TWILIO_VERIFY_SERVICE_SID')
+TWILIO_FROM_NUMBER = env('TWILIO_FROM_NUMBER')
+
+# Rate limiting (Redis-backed counters)
+# Employees use SMS; admins and clients use email.
+SMS_RATE_LIMITS = {
+    'per_user': {'1h': 3,   '6h': 6,   '1d': 10},
+    'global':   {'1h': 50,  '6h': 150, '1d': 500},
+}
+EMAIL_RATE_LIMITS = {
+    'per_user': {'1h': 5,   '6h': 10,  '1d': 20},
+    'global':   {'1h': 100, '6h': 300, '1d': 1000},
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -197,6 +209,13 @@ DJOSER = {
 
     'PASSWORD_RESET_CONFIRM_URL': 'email/password_reset_confirm/{uid}/{token}',
     'ACTIVATION_URL': 'email/activate/{uid}/{token}',
+
+    'EMAIL': {
+        'activation': 'apps.accounts.emails.ActivationEmail',
+        'confirmation': 'apps.accounts.emails.ConfirmationEmail',
+        'password_reset': 'apps.accounts.emails.PasswordResetEmail',
+        'password_changed_confirmation': 'apps.accounts.emails.PasswordChangedConfirmationEmail',
+    },
 
     'SERIALIZERS': {
         'user_create': 'apps.accounts.serializers.UserCreateSerializer',

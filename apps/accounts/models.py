@@ -26,6 +26,16 @@ class MessageType(models.TextChoices):
     PASSWORD_RESET = 'PASSWORD_RESET', 'Restablecimiento de contraseña'
     PASSWORD_RESET_CONFIRM = 'PASSWORD_RESET_CONFIRM', 'Confirmación de restablecimiento de contraseña'
 
+
+class MessageChannel(models.TextChoices):
+    EMAIL = 'EMAIL', 'Correo electrónico'
+    SMS = 'SMS', 'SMS'
+
+
+class MessageStatus(models.TextChoices):
+    SUCCESS = 'SUCCESS', 'Enviado'
+    FAILED  = 'FAILED',  'Fallido'
+
 class UserAccountManager(BaseUserManager):
     """
     Manager for user accounts.
@@ -34,7 +44,7 @@ class UserAccountManager(BaseUserManager):
     RESTRICTED_USERNAMES = ['admin', 'superuser', 'staff', 'undefined', 'null', 'root', 'system']
 
     def create_user(self, email, password=None, **extra_fields):
-        phone = extra_fields.get('phone', '')
+        phone = extra_fields.get('phone_number', '')
         role = extra_fields.get('role', Role.EMPLOYEE)
 
         if role == Role.EMPLOYEE and not phone:
@@ -192,7 +202,20 @@ class EmployeeMessages(BaseModel):
         max_length=50,
         choices=MessageType.choices,
     )
+    channel = models.CharField(
+        "canal",
+        max_length=5,
+        choices=MessageChannel.choices,
+        default=MessageChannel.SMS,
+    )
+    status = models.CharField(
+        "estado",
+        max_length=10,
+        choices=MessageStatus.choices,
+        default=MessageStatus.SUCCESS,
+    )
     message = models.TextField("mensaje")
+    error_message = models.TextField("mensaje de error", blank=True)
 
     employee_name = models.CharField("nombre del empleado", max_length=255, blank=True)
     phone_number = models.CharField("teléfono", max_length=15, blank=True)
@@ -228,7 +251,20 @@ class AdminMessages(BaseModel):
         max_length=50,
         choices=MessageType.choices,
     )
+    channel = models.CharField(
+        "canal",
+        max_length=5,
+        choices=MessageChannel.choices,
+        default=MessageChannel.EMAIL,
+    )
+    status = models.CharField(
+        "estado",
+        max_length=10,
+        choices=MessageStatus.choices,
+        default=MessageStatus.SUCCESS,
+    )
     message = models.TextField("mensaje")
+    error_message = models.TextField("mensaje de error", blank=True)
 
     admin_name = models.CharField("nombre del admin", max_length=255, blank=True)
     phone_number = models.CharField("teléfono", max_length=15, blank=True)
@@ -264,7 +300,20 @@ class ClientMessages(BaseModel):
         max_length=50,
         choices=MessageType.choices,
     )
+    channel = models.CharField(
+        "canal",
+        max_length=5,
+        choices=MessageChannel.choices,
+        default=MessageChannel.EMAIL,
+    )
+    status = models.CharField(
+        "estado",
+        max_length=10,
+        choices=MessageStatus.choices,
+        default=MessageStatus.SUCCESS,
+    )
     message = models.TextField("mensaje")
+    error_message = models.TextField("mensaje de error", blank=True)
 
     client_name = models.CharField("nombre del cliente", max_length=255, blank=True)
     phone_number = models.CharField("teléfono", max_length=15, blank=True)

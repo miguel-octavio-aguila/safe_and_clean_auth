@@ -25,10 +25,8 @@ class RateLimitExceeded(Exception):
 
 
 def _increment(key, window_seconds):
-    count = cache.incr(key)
-    if count == 1:
-        cache.expire(key, window_seconds)
-    return count
+    cache.add(key, 0, timeout=window_seconds)
+    return cache.incr(key)
 
 
 def enforce_rate_limit(service_name, user_id=None):

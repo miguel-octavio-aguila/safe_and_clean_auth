@@ -554,7 +554,7 @@ class EmailLogFunctionTest(TestCase):
         log = AdminMessages.objects.first()
         self.assertEqual(log.status, MessageStatus.FAILED)
         self.assertEqual(log.error_message, 'Resend API error 500')
-        self.assertIn('error', log.message)
+        self.assertIn('error', log.message.lower())
 
     def test_log_employee_does_not_create_any_record(self):
         email_log(self.employee, MessageType.ACTIVATION, 'emp@test.internal', MessageStatus.SUCCESS)

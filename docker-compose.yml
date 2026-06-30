@@ -9,8 +9,36 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - sc_redis_auth
-      - sc_db_auth
+      sc_db_auth:
+        condition: service_healthy
+      sc_redis_auth:
+        condition: service_started
+
+  # Celery worker
+  sc_auth_celery_worker:
+    container_name: sc_auth_celery_worker
+    build: .
+    command: celery -A safe_and_clean_auth worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      sc_db_auth:
+        condition: service_healthy
+      sc_redis_auth:
+        condition: service_started
+
+  # Celery beat
+  sc_auth_celery_beat:
+    container_name: sc_auth_celery_beat
+    build: .
+    command: celery -A safe_and_clean_auth beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/app
+    depends_on:
+      sc_db_auth:
+        condition: service_healthy
+      sc_redis_auth:
+        condition: service_started
 
   # Redis
   sc_redis_auth:
@@ -32,3 +60,8 @@ services:
       - "5433:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sc_user_auth -d sc_db_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

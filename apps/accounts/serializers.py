@@ -131,6 +131,10 @@ class EmployeeRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
+    emergency_contact_first_name = serializers.CharField(max_length=150)
+    emergency_contact_last_name = serializers.CharField(max_length=150)
+    emergency_contact_phone_number = serializers.CharField(max_length=15)
+    emergency_contact_relation = serializers.CharField(max_length=150, required=False, allow_blank=True)
     password = serializers.CharField(write_only=True)
     re_password = serializers.CharField(write_only=True)
 

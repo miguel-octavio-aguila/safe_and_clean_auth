@@ -24,3 +24,7 @@ djangorestframework-simplejwt==5.5.1
 resend==2.10.0
 
 twilio==9.6.3
+
+celery==5.6.3
+django-celery-results==2.6.0
+django-celery-beat==2.9.0

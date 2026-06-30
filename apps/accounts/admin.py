@@ -45,8 +45,35 @@ class UserProfileInline(admin.StackedInline):
     model = UserProfile
     extra = 0
     readonly_fields = ('id', 'created_at', 'updated_at')
-    fields = ('profile_picture',)
-    verbose_name = 'Foto de perfil'
+
+    fieldsets = (
+        ('Foto de perfil', {
+            'fields': ('profile_picture',),
+        }),
+        ('Contrato', {
+            'fields': ('contract_start', 'contract_end'),
+        }),
+        ('Datos personales', {
+            'fields': (
+                'curp',
+                'rfc',
+                'nss',
+                'date_of_birth',
+                'age',
+                'gender',
+                'place_of_birth',
+                'marital_status',
+                'address',
+            ),
+        }),
+        ('Uniforme (solo empleados)', {
+            'fields': ('shirt_size', 'pants_size', 'shoe_size'),
+        }),
+        ('Registro', {
+            'fields': ('id', 'created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
 
 
 class CustomUserAdmin(UserAdmin):
@@ -70,16 +97,24 @@ class CustomUserAdmin(UserAdmin):
 
     fieldsets = (
         ('Cuenta', {
-            'fields': ('id', 'email', 'phone_number', 'role', 'username', 'password')
+            'fields': ('id', 'email', 'phone_number', 'role', 'username', 'password'),
         }),
         ('Información personal', {
-            'fields': ('first_name', 'last_name')
+            'fields': ('first_name', 'last_name'),
+        }),
+        ('Contacto de emergencia', {
+            'fields': (
+                'emergency_contact_first_name',
+                'emergency_contact_last_name',
+                'emergency_contact_phone_number',
+                'emergency_contact_relation',
+            ),
         }),
         ('Permisos', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),
         ('Fechas', {
-            'fields': ('last_login', 'created_at', 'updated_at')
+            'fields': ('last_login', 'created_at', 'updated_at'),
         }),
     )
 
@@ -93,6 +128,10 @@ class CustomUserAdmin(UserAdmin):
                 'username',
                 'first_name',
                 'last_name',
+                'emergency_contact_first_name',
+                'emergency_contact_last_name',
+                'emergency_contact_phone_number',
+                'emergency_contact_relation',
                 'password1',
                 'password2',
                 'is_active',
@@ -169,16 +208,16 @@ class EmployeeMessagesAdmin(_MessageLogAdmin):
     )
     fieldsets = (
         ('Destinatario', {
-            'fields': ('id', 'employee', 'employee_name', 'phone_number')
+            'fields': ('id', 'employee', 'employee_name', 'phone_number'),
         }),
         ('Mensaje enviado', {
-            'fields': ('messageType', 'channel', 'status', 'message')
+            'fields': ('messageType', 'channel', 'status', 'message'),
         }),
         ('Error', {
-            'fields': ('error_message',)
+            'fields': ('error_message',),
         }),
         ('Fechas de registro', {
-            'fields': ('created_at', 'updated_at')
+            'fields': ('created_at', 'updated_at'),
         }),
     )
 
@@ -210,16 +249,16 @@ class AdminMessagesAdmin(_MessageLogAdmin):
     )
     fieldsets = (
         ('Destinatario', {
-            'fields': ('id', 'admin', 'admin_name', 'phone_number')
+            'fields': ('id', 'admin', 'admin_name', 'phone_number'),
         }),
         ('Mensaje enviado', {
-            'fields': ('messageType', 'channel', 'status', 'message')
+            'fields': ('messageType', 'channel', 'status', 'message'),
         }),
         ('Error', {
-            'fields': ('error_message',)
+            'fields': ('error_message',),
         }),
         ('Fechas de registro', {
-            'fields': ('created_at', 'updated_at')
+            'fields': ('created_at', 'updated_at'),
         }),
     )
 
@@ -251,15 +290,15 @@ class ClientMessagesAdmin(_MessageLogAdmin):
     )
     fieldsets = (
         ('Destinatario', {
-            'fields': ('id', 'client', 'client_name', 'phone_number')
+            'fields': ('id', 'client', 'client_name', 'phone_number'),
         }),
         ('Mensaje enviado', {
-            'fields': ('messageType', 'channel', 'status', 'message')
+            'fields': ('messageType', 'channel', 'status', 'message'),
         }),
         ('Error', {
-            'fields': ('error_message',)
+            'fields': ('error_message',),
         }),
         ('Fechas de registro', {
-            'fields': ('created_at', 'updated_at')
+            'fields': ('created_at', 'updated_at'),
         }),
     )

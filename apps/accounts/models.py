@@ -23,6 +23,8 @@ class MessageType(models.TextChoices):
     PASSWORD_CHANGE = 'PASSWORD_CHANGE', 'Cambio de contraseña'
     PASSWORD_RESET = 'PASSWORD_RESET', 'Restablecimiento de contraseña'
     PASSWORD_RESET_CONFIRM = 'PASSWORD_RESET_CONFIRM', 'Confirmación de restablecimiento de contraseña'
+    CONTRACT_EXPIRING = 'CONTRACT_EXPIRING', 'Contrato próximo a expirar'
+    CONTRACT_EXPIRED = 'CONTRACT_EXPIRED', 'Contrato expirado'
 
 
 class MessageChannel(models.TextChoices):
@@ -63,6 +65,12 @@ class UserAccountManager(BaseUserManager):
         if not first_name or not last_name:
             raise ValueError('Los usuarios deben de tener un nombre y apellido registrado')
 
+        ec_first = extra_fields.get('emergency_contact_first_name', '')
+        ec_last = extra_fields.get('emergency_contact_last_name', '')
+        ec_phone = extra_fields.get('emergency_contact_phone_number', '')
+        if not ec_first or not ec_last or not ec_phone:
+            raise ValueError('Los usuarios deben de tener un contacto de emergencia registrado (nombre, apellido y teléfono)')
+
         username = extra_fields.get('username', None)
         if username and username.lower() in self.RESTRICTED_USERNAMES:
             raise ValueError(f'El nombre de usuario "{username}" no está permitido.')
@@ -94,12 +102,56 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     Supports three roles: Admin, Employee, and Client.
     """
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    username = models.CharField("nombre de usuario", max_length=150, unique=True)
-    email = models.EmailField("correo electrónico", unique=True, blank=True, null=True)
-    phone_number = models.CharField("teléfono", max_length=15, blank=True, null=True, unique=True)
-    first_name = models.CharField("nombre", max_length=150)
-    last_name = models.CharField("apellido", max_length=150)
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        unique=True
+    )
+    username = models.CharField(
+        "nombre de usuario", max_length=150, unique=True)
+    email = models.EmailField(
+        "correo electrónico",
+        unique=True,
+        blank=True,
+        null=True
+    )
+    phone_number = models.CharField(
+        "teléfono",
+        max_length=15,
+        blank=True,
+        null=True,
+        unique=True
+    )
+    first_name = models.CharField(
+        "nombre",
+        max_length=150
+    )
+    last_name = models.CharField(
+        "apellido",
+        max_length=150
+    )
+    emergency_contact_first_name = models.CharField(
+        "nombre del contacto de emergencia",
+        max_length=150,
+        null=True,
+    )
+    emergency_contact_last_name = models.CharField(
+        "apellido del contacto de emergencia",
+        max_length=150,
+        null=True,
+    )
+    emergency_contact_phone_number = models.CharField(
+        "teléfono del contacto de emergencia",
+        max_length=15,
+        null=True,
+    )
+    emergency_contact_relation = models.CharField(
+        "relación del contacto de emergencia",
+        max_length=150,
+        blank=True,
+        null=True,
+    )
 
     role = models.CharField(
         "rol",
@@ -168,6 +220,11 @@ class UserProfile(BaseModel):
         - Client details    → accounts.Client    (safe_and_clean_backend)
     """
 
+    class Gender(models.TextChoices):
+        MALE = 'MALE', 'Hombre'
+        FEMALE = 'FEMALE', 'Mujer'
+        OTHER = 'OTHER', 'Otro'
+
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,
@@ -177,6 +234,89 @@ class UserProfile(BaseModel):
     profile_picture = models.ImageField(
         "foto de perfil",
         upload_to=profile_picture_upload_to,
+        blank=True,
+        null=True,
+    )
+    contract_start = models.DateField(
+        "inicio del contrato",
+        blank=True,
+        null=True,
+    )
+    contract_end = models.DateField(
+        "fin del contrato",
+        blank=True,
+        null=True,
+    )
+    curp = models.CharField(
+        "CURP",
+        max_length=18,
+        blank=True,
+        null=True,
+    )
+    rfc = models.CharField(
+        "RFC",
+        max_length=13,
+        blank=True,
+        null=True,
+    )
+    nss = models.CharField(
+        "Número de seguro social",
+        max_length=15,
+        blank=True,
+        null=True,
+    )
+    date_of_birth = models.DateField(
+        "fecha de nacimiento",
+        blank=True,
+        null=True,
+    )
+    age = models.IntegerField(
+        "edad",
+        blank=True,
+        null=True,
+    )
+    gender = models.CharField(
+        "género",
+        max_length=20,
+        choices=Gender.choices,
+        blank=True,
+        null=True,
+    )
+    place_of_birth = models.CharField(
+        "lugar de nacimiento",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+    marital_status = models.CharField(
+        "estado civil",
+        max_length=20,
+        blank=True,
+        null=True,
+    )
+    address = models.CharField(
+        "dirección",
+        max_length=200,
+        blank=True,
+        null=True,
+    )
+
+    # Uniform sizes — only relevant for employees
+    shirt_size = models.CharField(
+        "talla de camisa",
+        max_length=10,
+        blank=True,
+        null=True,
+    )
+    pants_size = models.CharField(
+        "talla de pantalón",
+        max_length=10,
+        blank=True,
+        null=True,
+    )
+    shoe_size = models.CharField(
+        "talla de zapatos",
+        max_length=10,
         blank=True,
         null=True,
     )

@@ -1,6 +1,7 @@
 import os
 import environ
 from datetime import timedelta
+from celery.schedules import crontab
 
 from pathlib import Path
 
@@ -45,6 +46,8 @@ THIRD_PARTY_APPS = [
     'djoser',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'django_celery_results',
+    'django_celery_beat',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS + THIRD_PARTY_APPS
@@ -257,3 +260,28 @@ CACHES = {
 CHANNELS_ALLOWED_ORIGINS = [
     "http://localhost:3000"
 ]
+
+# Celery
+CELERY_BROKER_URL = env('REDIS_URL')
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'visibility_timeout': 3600,
+}
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+
+CELERY_BEAT_SCHEDULE = {
+    'notify-contracts-expiring-soon': {
+        'task': 'apps.accounts.tasks.notify_contracts_expiring_soon',
+        'schedule': crontab(hour=9, minute=0),
+    },
+    'notify-contracts-expired': {
+        'task': 'apps.accounts.tasks.notify_contracts_expired',
+        'schedule': crontab(hour=9, minute=5),
+    },
+}

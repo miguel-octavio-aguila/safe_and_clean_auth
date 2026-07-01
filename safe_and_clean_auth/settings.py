@@ -17,6 +17,13 @@ environ.Env.read_env()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
+# API Keys
+ADMIN_API_KEY    = env.str('ADMIN_API_KEY')
+EMPLOYEE_API_KEY = env.str('EMPLOYEE_API_KEY')
+CLIENT_API_KEY   = env.str('CLIENT_API_KEY')
+
+VALID_API_KEYS = [ADMIN_API_KEY, EMPLOYEE_API_KEY, CLIENT_API_KEY]
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -41,6 +48,7 @@ PROJECT_APPS = [
 
 THIRD_PARTY_APPS = [
     'rest_framework',
+    'rest_framework_api',
     'channels',
     'channels_redis',
     'djoser',

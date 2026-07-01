@@ -1,7 +1,13 @@
+import datetime
+
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.utils import timezone
 from django.utils.html import format_html
+from botocore.signers import CloudFrontSigner
 
+from utils.s3_utils import rsa_signer
 from .models import (
     AdminMessages,
     ClientMessages,
@@ -44,11 +50,25 @@ def _channel_badge(obj):
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     extra = 0
-    readonly_fields = ('id', 'created_at', 'updated_at')
+    readonly_fields = ('id', 'created_at', 'updated_at', 'profile_picture_preview')
+
+    @admin.display(description='Vista previa')
+    def profile_picture_preview(self, obj):
+        if not obj.profile_picture:
+            return '-'
+        signer = CloudFrontSigner(settings.AWS_CLOUDFRONT_KEY_ID, rsa_signer)
+        expire_date = timezone.now() + datetime.timedelta(seconds=60)
+        url = f"https://{settings.AWS_CLOUDFRONT_DOMAIN}/{settings.MEDIA_LOCATION}/{obj.profile_picture.name}"
+        signed_url = signer.generate_presigned_url(url, date_less_than=expire_date)
+        return format_html(
+            '<img src="{}" style="max-height:160px;max-width:160px;object-fit:cover;'
+            'border-radius:50%;border:2px solid #E2E8F0;" />',
+            signed_url,
+        )
 
     fieldsets = (
         ('Foto de perfil', {
-            'fields': ('profile_picture',),
+            'fields': ('profile_picture', 'profile_picture_preview'),
         }),
         ('Contrato', {
             'fields': ('contract_start', 'contract_end'),

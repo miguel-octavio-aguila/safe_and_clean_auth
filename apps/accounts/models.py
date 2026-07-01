@@ -488,7 +488,7 @@ def post_user_registered(user, *args, **kwargs):
     print("Usuario registrado exitosamente")
 
 def post_user_activated(user, *args, **kwargs):
-    print("Usuario activado exitosamente")
+    UserProfile.objects.get_or_create(user=user)
 
 user_registered.connect(post_user_registered)
 user_activated.connect(post_user_activated)

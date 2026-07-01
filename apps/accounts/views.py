@@ -79,6 +79,9 @@ class EmployeeActivateView(APIView):
         user.is_active = True
         user.save()
 
+        from .models import UserProfile
+        UserProfile.objects.get_or_create(user=user)
+
         try:
             send_confirmation_sms(user)
         except Exception:

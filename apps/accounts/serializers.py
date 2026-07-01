@@ -1,9 +1,16 @@
+import datetime
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
+from django.utils import timezone
 from rest_framework import serializers, exceptions
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from djoser.serializers import UserCreatePasswordRetypeSerializer
-from apps.accounts.models import Role
+from botocore.signers import CloudFrontSigner
+
+from .models import Role, UserProfile
+from utils.s3_utils import rsa_signer
 
 User = get_user_model()
 
@@ -14,14 +21,58 @@ class UserCreateSerializer(UserCreatePasswordRetypeSerializer):
         fields = "__all__"
 
 
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_picture_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'id',
+            'profile_picture_url',
+            'contract_start',
+            'contract_end',
+            'curp',
+            'rfc',
+            'nss',
+            'date_of_birth',
+            'age',
+            'gender',
+            'place_of_birth',
+            'marital_status',
+            'address',
+            'shirt_size',
+            'pants_size',
+            'shoe_size',
+            'created_at',
+            'updated_at',
+        ]
+
+    def get_profile_picture_url(self, obj):
+        if not obj.profile_picture:
+            return None
+        signer = CloudFrontSigner(settings.AWS_CLOUDFRONT_KEY_ID, rsa_signer)
+        expire_date = timezone.now() + datetime.timedelta(seconds=60)
+        obj_url = f"https://{settings.AWS_CLOUDFRONT_DOMAIN}/{settings.MEDIA_LOCATION}/{obj.profile_picture.name}"
+        return signer.generate_presigned_url(obj_url, date_less_than=expire_date)
+
+
 class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = [
+            'id',
             'username',
+            'email',
+            'phone_number',
             'first_name',
             'last_name',
-            'updated_at'
+            'role',
+            'is_active',
+            'profile',
+            'created_at',
+            'updated_at',
         ]
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
